@@ -1,12 +1,16 @@
 package com.desafio_dev.desafio_dev.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import br.com.caelum.stella.bean.validation.CPF;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +31,9 @@ public class User implements Serializable{
 	
 	@CPF
 	private String cpf;
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<UserDocumentation> documentations = new ArrayList<>();
 	
 	
 	
