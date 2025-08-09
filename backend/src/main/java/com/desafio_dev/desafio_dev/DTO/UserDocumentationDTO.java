@@ -1,10 +1,10 @@
 package com.desafio_dev.desafio_dev.DTO;
 
 import com.desafio_dev.desafio_dev.enums.DocumentType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,8 +21,8 @@ public class UserDocumentationDTO {
 	@NotBlank(message = "Numero do documento  é obrigatório")
     private String number;
 	
+	@JsonIgnore
 	@NotNull(message = "Documento é obrigatório")
-	@Size(max = 2 * 1024 * 1024, message = "Documento não pode ultrapassar 2MB")
 	private byte[] document;
     private Long userId;
 	    
