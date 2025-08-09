@@ -15,6 +15,7 @@ import com.desafio_dev.desafio_dev.DTO.UserDTO;
 import com.desafio_dev.desafio_dev.entities.User;
 import com.desafio_dev.desafio_dev.repositories.UserRepository;
 import com.desafio_dev.desafio_dev.services.exceptions.DatabaseException;
+import com.desafio_dev.desafio_dev.services.exceptions.DesafioException;
 import com.desafio_dev.desafio_dev.services.exceptions.ResourceNotFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -41,21 +42,33 @@ public class UserService{
 	
 	@Transactional
 	public UserDTO insert(UserDTO dto) {
+		
+		if(repository.existsByCpf(dto.getCpf())) {
+			throw new DesafioException("CPF já cadastrado");
+		}
+		
 		User entity = new User();
 		entity.setName(dto.getName());
 		entity.setCpf(dto.getCpf());
 		entity = repository.save(entity);
 		
 		return new UserDTO(entity);
-		
 	}
 	
 	@Transactional
 	public UserDTO update(Long id, UserDTO dto) {
 		try {
 			User entity = repository.getReferenceById(id);
+			
+			Optional<User> userWithCpf = repository.findByCpf(dto.getCpf());
+			if(userWithCpf.isPresent() && !userWithCpf.get().getId().equals(id)) {
+				throw new DesafioException("CPF já cadastrado para outro usuário");
+			}
+			
 			entity.setName(dto.getName());
 			entity.setCpf(dto.getCpf());
+			
+			entity = repository.save(entity);
 			return new UserDTO(entity);			
 		} catch(EntityNotFoundException e) {
 			throw new ResourceNotFoundException("Id not Found " + id);
