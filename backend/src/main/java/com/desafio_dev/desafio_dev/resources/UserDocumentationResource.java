@@ -2,6 +2,7 @@ package com.desafio_dev.desafio_dev.resources;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,8 +30,12 @@ public class UserDocumentationResource {
 	
 	
 	@GetMapping
-	public ResponseEntity<Page<UserDocumentationDTO>> findAll(Pageable pageable) {
-	    Page<UserDocumentationDTO> list = service.findAll(pageable);
+	public ResponseEntity<Page<UserDocumentationDTO>> findAll(
+			@RequestParam(value = "page", defaultValue = "0") int Page,
+			@RequestParam(value = "limit", defaultValue = "10") int limit){
+	    
+		Pageable pageable = PageRequest.of(Page, limit);
+		Page<UserDocumentationDTO> list = service.findAll(pageable);
 	    return ResponseEntity.ok(list);
 	}
 	
