@@ -71,15 +71,20 @@ public class UserService{
 			entity = repository.save(entity);
 			return new UserDTO(entity);			
 		} catch(EntityNotFoundException e) {
-			throw new ResourceNotFoundException("Id not Found " + id);
+			throw new ResourceNotFoundException("ID not Found " + id);
 		}
 	}
 	
 	public void delete(Long id) {
+		if(!repository.existsById(id)) {
+			throw new ResourceNotFoundException("ID not Found: " + id);
+		}
+		
+		
 		try {
 			repository.deleteById(id);
 		}catch(EmptyResultDataAccessException e) {
-			throw new ResourceNotFoundException("ID Not Found " + id);
+			throw new ResourceNotFoundException("ID Not Found: " + id);
 		}catch(DataIntegrityViolationException e) {
 			throw new DatabaseException("Integrity Violation");
 		}
