@@ -53,12 +53,27 @@ public class ResourceExceptionHandler {
 	    StandardError err = new StandardError();
 	    err.setTimestamp(Instant.now());
 	    err.setStatus(status.value());
-	    err.setError("Application error");
+	    err.setError("Bad Request");
 	    err.setMessage(e.getMessage());
 	    err.setPath(request.getRequestURI());
 
 	    return ResponseEntity.status(status).body(err);
 	}
 	
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<StandardError> handleAllExceptions(Exception e, HttpServletRequest request){
+	    HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+	    StandardError err = new StandardError();
+	    err.setTimestamp(Instant.now());
+	    err.setStatus(status.value());
+	    err.setError("Internal Server Error");
+	    err.setMessage("Erro inesperado, entre em contato com o suporte.");
+	    err.setPath(request.getRequestURI());
+
+	    return ResponseEntity.status(status).body(err);
+	}
+
 	
 }
