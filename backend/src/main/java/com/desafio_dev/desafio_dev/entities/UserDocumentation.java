@@ -31,7 +31,7 @@ public class UserDocumentation  implements Serializable{
 		
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+	private Long id;
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Column(nullable = false)
