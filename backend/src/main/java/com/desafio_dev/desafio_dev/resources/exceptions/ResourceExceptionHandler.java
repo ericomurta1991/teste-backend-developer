@@ -4,8 +4,11 @@ import java.time.Instant;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.desafio_dev.desafio_dev.services.exceptions.DatabaseException;
 import com.desafio_dev.desafio_dev.services.exceptions.DesafioException;
@@ -24,7 +27,7 @@ public class ResourceExceptionHandler {
 		StandardError err = new StandardError();
 		err.setTimestamp(Instant.now());
 		err.setStatus(HttpStatus.NOT_FOUND.value());
-		err.setError("Resource not found");
+		err.setError("Not found");
 		err.setMessage(e.getMessage());
 		err.setPath(request.getRequestURI());
 		
@@ -60,6 +63,24 @@ public class ResourceExceptionHandler {
 	    return ResponseEntity.status(status).body(err);
 	}
 	
+	// Handler para erros de validação do Bean Validation
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ValidationError> handleValidationExceptions(MethodArgumentNotValidException e, HttpServletRequest request) {
+	    HttpStatus status = HttpStatus.BAD_REQUEST;
+	    ValidationError err = new ValidationError();
+	    err.setTimestamp(Instant.now());
+	    err.setStatus(status.value());
+	    err.setError("Validation exception");
+	    err.setMessage("Erro de validação nos campos");
+	    err.setPath(request.getRequestURI());
+
+	    for (FieldError f : e.getBindingResult().getFieldErrors()) {
+	        err.addError(f.getField(), f.getDefaultMessage());
+	    }
+
+	    return ResponseEntity.status(status).body(err);
+	}
+	
 	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<StandardError> handleAllExceptions(Exception e, HttpServletRequest request){
@@ -70,6 +91,20 @@ public class ResourceExceptionHandler {
 	    err.setStatus(status.value());
 	    err.setError("Internal Server Error");
 	    err.setMessage("Erro inesperado, entre em contato com o suporte.");
+	    err.setPath(request.getRequestURI());
+
+	    return ResponseEntity.status(status).body(err);
+	}
+	
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<StandardError> handleMaxSizeException(MaxUploadSizeExceededException e, HttpServletRequest request) {
+	    HttpStatus status = HttpStatus.BAD_REQUEST;
+
+	    StandardError err = new StandardError();
+	    err.setTimestamp(Instant.now());
+	    err.setStatus(status.value());
+	    err.setError("Bad Request");
+	    err.setMessage("Arquivo não pode exceder 2MB");
 	    err.setPath(request.getRequestURI());
 
 	    return ResponseEntity.status(status).body(err);
