@@ -1,6 +1,8 @@
 package com.desafio_dev.desafio_dev.resources.exceptions;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.desafio_dev.desafio_dev.services.exceptions.DatabaseException;
 import com.desafio_dev.desafio_dev.services.exceptions.DesafioException;
@@ -109,6 +112,18 @@ public class ResourceExceptionHandler {
 
 	    return ResponseEntity.status(status).body(err);
 	}
+	
+	 @ExceptionHandler(NoHandlerFoundException.class)
+	    public ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex) {
+	        Map<String, Object> body = new HashMap<>();
+	        body.put("timestamp", Instant.now());
+	        body.put("status", HttpStatus.NOT_FOUND.value());
+	        body.put("error", "Recurso não encontrado");
+	        body.put("message", "A rota " + ex.getRequestURL() + " não existe");
+	        body.put("path", ex.getRequestURL());
+
+	        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+	    }
 
 	
 }
